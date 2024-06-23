@@ -1,0 +1,8 @@
+prefix=/home/xc/loc_ws/install
+
+Name: dlio_loc
+Description: Description of dlio_loc
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib -ldlio_loc -lnano_gicp -lnanoflann
+Requires: roscpp std_msgs sensor_msgs geometry_msgs message_runtime message_generation pcl_ros
