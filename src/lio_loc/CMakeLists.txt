@@ -5,8 +5,6 @@ SET(CMAKE_BUILD_TYPE "Debug")
 SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
 SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
 
-
-
 add_compile_options(-std=c++14)
 set(CMAKE_BUILD_TYPE "Release")
 
@@ -64,12 +62,6 @@ find_package(catkin REQUIRED COMPONENTS
   visualization_msgs
 )
 
-# add_service_files(
-#   DIRECTORY srv
-#   FILES
-#   save_pcd.srv
-# )
-
 add_message_files(
   DIRECTORY msg
   FILES
@@ -107,8 +99,6 @@ include_directories(lib)
 
 include_directories(SYSTEM ${catkin_INCLUDE_DIRS})
 
-
-
 # Not all machines have <cpuid.h> available
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 file(WRITE ${CMAKE_BINARY_DIR}/test_cpuid.cpp "#include <cpuid.h>")
@@ -131,30 +121,17 @@ add_library(nano_gicp STATIC
 )
 target_link_libraries(nano_gicp ${PCL_LIBRARIES} ${OpenMP_LIBS} nanoflann)
 
-# add_executable(custom_msg_to_pc2_node src/dlio/custom_msg_to_pc2.cpp)
-# 链接库
-# target_link_libraries(custom_msg_to_pc2_node
-#   ${catkin_LIBRARIES}
-# )
-
 # Odometry Node
 add_executable(dlio_odom_node src/dlio/odom_node.cc src/dlio/odom.cc src/dlio/odom_callback.cc src/dlio/odom_helper.cc src/dlio/odom_declare.cc)
 add_dependencies(dlio_odom_node ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
 target_compile_options(dlio_odom_node PRIVATE ${OpenMP_FLAGS})
 target_link_libraries(dlio_odom_node ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenMP_LIBS} Threads::Threads nano_gicp /usr/local/lib/libyaml-cpp.so.0.7)
 
-# Mapping Node
-# add_executable (dlio_map_node src/dlio/map_node.cc src/dlio/map.cc)
-# add_dependencies(dlio_map_node ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
-# target_compile_options(dlio_map_node PRIVATE ${OpenMP_FLAGS})
-# target_link_libraries(dlio_map_node ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenMP_LIBS} Threads::Threads)
-
 # Binaries
 install( TARGETS dlio_odom_node
          DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION} )
 install( DIRECTORY param launch
          DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION} )
-
 
 # Range Image Projection
 add_executable(${PROJECT_NAME}_imageProjection src/lio/imageProjection.cpp)

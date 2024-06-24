@@ -108,8 +108,8 @@ private:
   void cloudReceived(sensor_msgs::PointCloud2ConstPtr msg);
   // 这里只是将最新的消息保存下来，实际处理在timerCallback中进行
   void cloudData(sensor_msgs::PointCloud2ConstPtr msg);
-
   void timerCallbackCloud(const ros::WallTimerEvent&);
+
   // void gnssReceived();
   void computeSpaciousness();
   void computeDensity();
@@ -132,13 +132,7 @@ private:
   void publishInitialMap();
   void publishFullMap();
 
-  //trans livoxmsg 
-  // void moveFromCustomMsgCallback(const livox_ros_driver::CustomMsgConstPtr &msg);
-
-  // tf2_ros::TransformBroadcaster broadcaster_;
   tf2_ros::TransformBroadcaster broadcaster_;
-  // tf2_ros::TransformBroadcaster broadcaster_odom_to_map;
-  // tf2_ros::TransformBroadcaster broadcaster_base_to_odom;
 
   ros::NodeHandle nh;
   ros::Time clock_;
@@ -146,12 +140,12 @@ private:
   ros::WallTimer publish_timer;
   ros::WallTimer publish_timer_;
   ros::WallTimer publish_full_map_;
-  // 每个2s执行一次全局地图匹配
+  // 每个1s执行一次全局地图匹配
   ros::WallTimer cloud_timer_;
 
   ros::NodeHandle mt_nh;
+
   // Subscribers
-  
   ros::Subscriber initial_pose_sub_;
   ros::Subscriber map_sub_;
   ros::Subscriber odom_sub_;
@@ -164,14 +158,8 @@ private:
   ros::Publisher pose_pub_;
   ros::Publisher initial_map_pub_;
   ros::Publisher initial_full_map_pub_;
-  ros::Publisher pub_pc2;
+  ros::Publisher gicp_pose_pub;
 
-  // liovox custommsg
-  // pcl::PointCloud<PointXYZIRT>::Ptr laserCloudIn;
-
-
-  // ros::CallbackInterfacePtr lidar_cb_group, imu_cb_group, odom_cb_group,
-      // initial_pose_cb_group, map_cb_group;
   ros::CallbackQueue lidar_cb_group, imu_cb_group, odom_cb_group,
       initial_pose_cb_group, map_cb_group;
 
@@ -184,9 +172,6 @@ private:
   
   // 储存最新一帧的点云
   sensor_msgs::PointCloud2ConstPtr latest_cloud_msg_;
-
-  // pc2点云
-  // sensor_msgs::PointCloud2 pc2_cloud;
 
   sensor_msgs::PointCloud2Ptr map_msg_ptr; 
   sensor_msgs::PointCloud2Ptr full_map_msg_ptr; 

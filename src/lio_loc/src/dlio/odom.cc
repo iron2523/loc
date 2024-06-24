@@ -223,8 +223,7 @@ void dlio::OdomNode::createPublishers() {
   // path_pub_ = create_publisher<nav_msgs::msg::Path>("path", 1);
   initial_map_pub_ = nh.advertise<sensor_msgs::PointCloud2>("initial_map", true);
   initial_full_map_pub_ = nh.advertise<sensor_msgs::PointCloud2>("initial_full_map", true);
-  // pub_pc2 = nh.advertise<sensor_msgs::PointCloud2>("cloud_pc2", 1);
-  
+  gicp_pose_pub = nh.advertise<geometry_msgs::PoseStamped>("gicp_pose", 10);
 }
 
 void dlio::OdomNode::createSubscribers() {
@@ -393,8 +392,7 @@ void dlio::OdomNode::deskewPointcloud() {
 
   // 计算中位点的索引，并设置扫描时间戳
   int median_pt_index = timestamps.size() / 2;
-  this->scan_stamp =
-      timestamps[median_pt_index];  // set this->scan_stamp to the timestamp of
+  this->scan_stamp = timestamps[median_pt_index];  // set this->scan_stamp to the timestamp of
                                     // the median point
 
   // don't process scans until IMU data is present
@@ -590,6 +588,22 @@ void dlio::OdomNode::updateState() {
   this->state.q.y() += dt * this->geo_Kq_ * qcorr.y();
   this->state.q.z() += dt * this->geo_Kq_ * qcorr.z();
   this->state.q.normalize();
+
+  // 发布每次地图匹配后的位姿
+  geometry_msgs::PoseStamped update_pose_msg;
+  // 最新imubuffer时间
+  update_pose_msg.header.stamp = ros::Time(this->imu_buffer.front().stamp);
+  update_pose_msg.header.frame_id = "map_11";
+  // pose
+  update_pose_msg.pose.position.x = this->state.p[0];
+  update_pose_msg.pose.position.y = this->state.p[1];
+  update_pose_msg.pose.position.z = this->state.p[2];
+  // qua
+  update_pose_msg.pose.orientation.x = this->state.q.x();
+  update_pose_msg.pose.orientation.y = this->state.q.y();
+  update_pose_msg.pose.orientation.z = this->state.q.z();
+  update_pose_msg.pose.orientation.w = this->state.q.w();
+  gicp_pose_pub.publish(update_pose_msg);
 
   // store previous pose, orientation, and velocity
   this->geo.prev_p = this->state.p;
