@@ -335,8 +335,6 @@ void dlio::OdomNode::publishPoseThread() {
     // transform_stamped_base_link_to_odom.transform.translation.z = pose_msg.pose.pose.position.z;
     // transform_stamped_base_link_to_odom.transform.rotation = quat_msg;
     // this->broadcaster_base_to_odom.sendTransform(transform_stamped_base_link_to_odom);
-
-    // ROS_INFO("Output state- x: %.3f, y:%.3f, z:%.3f",
     //  pose_msg.pose.pose.position.x, pose_msg.pose.pose.position.y, pose_msg.pose.pose.position.z);
 }
 
@@ -350,20 +348,15 @@ void dlio::OdomNode::cloudData(sensor_msgs::PointCloud2ConstPtr msg) {
 }
 
 void dlio::OdomNode::timerCallbackCloud(const ros::WallTimerEvent&) {
+    // 检查是否有点云
     if (latest_cloud_msg_ != nullptr) {
-        // if (!map_recieved_ || !initialpose_recieved_) {
-        //     ROS_INFO("1");
-        //     return;
-        // }
-        // //检查IMU是否完成初始化
-        // if (!this->first_imu_received_ || !this->imu_calibrated) {
-        //     ROS_INFO("2clouddddd");
 
-        //     return;
-        // }
+        //检查IMU是否完成初始化
+        if (!this->first_imu_received_ || !this->imu_calibrated) {
+            return;
+        }
         //初始化第一帧雷达时间
         if (this->prev_scan_stamp == 0.) {
-            // this->prev_scan_stamp = rclcpp::Time(msg->header.stamp).seconds();
             this->prev_scan_stamp = latest_cloud_msg_->header.stamp.toSec();
             ROS_INFO("prev_scan_stamp: %f seconds", this->prev_scan_stamp);
 
@@ -372,21 +365,15 @@ void dlio::OdomNode::timerCallbackCloud(const ros::WallTimerEvent&) {
         }
         //第一帧有效雷达时间
         if (this->first_scan_stamp == 0.) {
-            // this->first_scan_stamp = rclcpp::Time(msg->header.stamp).seconds();
             this->first_scan_stamp = latest_cloud_msg_->header.stamp.toSec();
             ROS_INFO("first_scan_stamp: %f seconds", first_scan_stamp);
 
         }
-        // rclcpp::Time start = this->now();    
         this->getScanFromROS(latest_cloud_msg_);
         //畸变补偿
         this->deskewPointcloud();
-        // this->scan_stamp = latest_cloud_msg_->header.stamp.toSec();
-        // ROS_INFO("this->scan_stamp: %.6f", this->scan_stamp);
 
         if (scan_dt < 1e-6) {
-            // RCLCPP_ERROR(get_logger(), "scan dt is invalid: %f", scan_dt);
-            // ROS_ERROR("scan dt is invalid: %f", scan_dt);
             return;
         }
         //是否开启体素滤波
@@ -403,16 +390,10 @@ void dlio::OdomNode::timerCallbackCloud(const ros::WallTimerEvent&) {
         if (!this->first_valid_scan) {
             return;
         }   
-        // hv::async(std::bind(&OdomNode::computeMetrics, this));
         this->setInputSource();
         this->getNextPose();
-        // RCLCPP_INFO_STREAM(get_logger(), "pose matrix carried out: \n " <<
-        // to_string_with_precision(this->T));  
-        // Update time stamps
-        // this->lidar_rates.push_back(1. / (this->scan_stamp -
-        // this->prev_scan_stamp));
-        this->prev_scan_stamp = this->scan_stamp;
 
+        this->prev_scan_stamp = this->scan_stamp;
     }
 }
 

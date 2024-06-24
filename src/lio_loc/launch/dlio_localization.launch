@@ -1,4 +1,5 @@
 <launch>
+  <arg name="project" default="dlio_loc"/>
   <arg name="rviz" default="true"/>
   <param name="robot_description" textfile="$(find dlio_loc)/urdf/bunker.urdf" />
   <!-- <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" /> -->
@@ -9,7 +10,6 @@
   <node pkg="tf2_ros" type="static_transform_publisher" name="odom_tf" args="0.0 0.0 0.0 0.0 0.0 0.0 map_1 odom" output = "screen"/>
   <node pkg="tf2_ros" type="static_transform_publisher" name="map_1_tf" args="0.0 0.0 0.0 0.0 0.0 0.0 map map_1" output = "screen"/>
   <node pkg="tf2_ros" type="static_transform_publisher" name="map_2_tf" args="0.0 0.0 0.0 0.0 0.0 0.0 map map_2" output = "screen"/>
-
 
   <node name="dlio_loc" pkg="dlio_loc" type="dlio_odom_node" output="screen">
     <!-- <remap from="livox/lidar" to="cloud"/> -->

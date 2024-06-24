@@ -6,7 +6,7 @@
     <env name="ROSCONSOLE_CONFIG_FILE" value="$(find dlio_loc)/launch/include/rosconsole/rosconsole_error.conf"/>
     
     <!-- Parameters -->
-    <rosparam file="$(find dlio_loc)/config/paramsLivoxIMU.yaml" command="load" />
+    <rosparam file="$(find dlio_loc)/config/paramRslidarIMU.yaml" command="load" />
 
     <!--- LOAM -->
     <include file="$(find dlio_loc)/launch/include/module_loam.launch" />

@@ -220,25 +220,13 @@ chrono
 mutex
 -
 
-/home/xc/loc_ws/src/lio_loc/src/dlio/odom.cc
-dlio/odom.h
-/home/xc/loc_ws/src/lio_loc/src/dlio/dlio/odom.h
-
 /home/xc/loc_ws/src/lio_loc/src/dlio/odom_callback.cc
 dlio/odom.h
 -
 dlio_loc/state_info.h
 -
 
-/home/xc/loc_ws/src/lio_loc/src/dlio/odom_declare.cc
-dlio/odom.h
--
-
 /home/xc/loc_ws/src/lio_loc/src/dlio/odom_helper.cc
-dlio/odom.h
--
-
-/home/xc/loc_ws/src/lio_loc/src/dlio/odom_node.cc
 dlio/odom.h
 /home/xc/loc_ws/src/lio_loc/src/dlio/dlio/odom.h
 
