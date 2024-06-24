@@ -354,6 +354,7 @@ public:
             return;
 
         // 当前帧激光位姿，来自scan-to-map匹配、因子图优化后的位姿
+        // @yjf
         float p_x = odomMsg->pose.pose.position.x;
         float p_y = odomMsg->pose.pose.position.y;
         float p_z = odomMsg->pose.pose.position.z;
