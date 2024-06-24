@@ -1,11 +1,9 @@
 #include <dlio/odom.h>
 #include <dlio_loc/state_info.h>
 
-
 // @yjf
 // trans livoxmsg 
 // void dlio::OdomNode::moveFromCustomMsgCallback(const livox_ros_driver::CustomMsgConstPtr &msg) {
-    
 //     pcl::PointCloud<pcl::PointXYZI> pclcloud;
 //     pcl::PointXYZI point;
 //     // pcl::PointXYZI point_livox;
