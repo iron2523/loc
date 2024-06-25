@@ -589,6 +589,7 @@ void dlio::OdomNode::updateState() {
   this->state.q.z() += dt * this->geo_Kq_ * qcorr.z();
   this->state.q.normalize();
 
+  //@yjf
   // 发布每次地图匹配后的位姿
   geometry_msgs::PoseStamped update_pose_msg;
   // 最新imubuffer时间

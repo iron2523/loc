@@ -206,6 +206,13 @@ public:
     // 当前帧位姿
     Eigen::Affine3f incrementalOdometryAffineBack;
 
+    //@yjf
+    // add initlocalization
+    ros::Subscriber sub_initial_pose;
+    bool has_initialize_pose = false;
+    bool system_initialized = false;
+    float initialize_pose[6];
+
     /**
      * 构造函数
     */
@@ -251,6 +258,10 @@ public:
         pubRecentKeyFrame     = nh.advertise<sensor_msgs::PointCloud2>("lio_sam/mapping/cloud_registered", 1);
         // 发布当前帧原始点云配准之后的点云
         pubCloudRegisteredRaw = nh.advertise<sensor_msgs::PointCloud2>("lio_sam/mapping/cloud_registered_raw", 1);
+
+        //@yjf
+        // 初始化位姿
+        sub_initial_pose = nh.subscribe("gicp_pose", 10, &mapOptimization::initialposeHandler, this);
 
         downSizeFilterCorner.setLeafSize(mappingCornerLeafSize, mappingCornerLeafSize, mappingCornerLeafSize);
         downSizeFilterSurf.setLeafSize(mappingSurfLeafSize, mappingSurfLeafSize, mappingSurfLeafSize);
@@ -337,6 +348,32 @@ public:
      * 7、发布激光里程计
      * 8、发布里程计、点云、轨迹
     */
+    
+    //@yjf
+    // 初始化位姿回调函数
+    void initialposeHandler(const geometry_msgs::PoseStamped::ConstPtr &msgIn) {
+        tf::Quaternion q(msgIn->pose.orientation.x, msgIn->pose.orientation.y, 
+                            msgIn->pose.orientation.z, msgIn->pose.orientation.w);
+        tf::Matrix3x3 qm(q);
+
+        double roll, pitch, yaw;
+        qm.getRPY(roll, pitch, yaw);
+
+        initialize_pose[0] = roll;
+        initialize_pose[1] = pitch;
+        initialize_pose[2] = yaw;
+
+        initialize_pose[3] = msgIn->pose.position.x;
+        initialize_pose[4] = msgIn->pose.position.y;
+        initialize_pose[5] = msgIn->pose.position.z;
+
+        std::cout << "manual initialize pose: \n" << initialize_pose[3] << "\n" << initialize_pose[4] << "\n" << initialize_pose[5] << "\n" 
+                  << initialize_pose[0] << "\n" << initialize_pose[1] << "\n" << initialize_pose[2] << std::endl;
+
+        has_initialize_pose = true;
+    }
+
+
     void laserCloudInfoHandler(const dlio_loc::cloud_infoConstPtr& msgIn)
     {
         // 当前激光帧时间戳
@@ -355,6 +392,10 @@ public:
         if (timeLaserInfoCur - timeLastProcessing >= mappingProcessInterval)
         {
             timeLastProcessing = timeLaserInfoCur;
+
+            if (!system_initialized)
+                if (!systemInitialize())
+                    return;
 
             // 当前帧位姿初始化
             // 1、如果是第一帧，用原始imu数据的RPY初始化当前帧位姿（旋转部分）
@@ -404,6 +445,28 @@ public:
             // 4、发布里程计轨迹
             publishFrames();
         }
+    }
+
+    //@yjf
+    bool systemInitialize() {
+        if (!has_initialize_pose) {
+            ROS_INFO("Wait initilize pose");
+            return false;
+        }
+        // 更新校正后的位姿
+        transformTobeMapped[0] = initialize_pose[0];
+        transformTobeMapped[1] = initialize_pose[1];
+        transformTobeMapped[2] = initialize_pose[2];
+        transformTobeMapped[3] = initialize_pose[3];
+        transformTobeMapped[4] = initialize_pose[4];
+        transformTobeMapped[5] = initialize_pose[5];
+        // 使用校正后的位姿变换原始点云，并发布
+        pcl::PointCloud<PointType>::Ptr cloudOut(new pcl::PointCloud<PointType>());
+        PointTypePose thisPose6D = trans2PointTypePose(transformTobeMapped);
+        *cloudOut += *transformPointCloud(laserCloudSurfLast, &thisPose6D);
+        publishCloud(&pubRecentKeyFrame, cloudOut, timeLaserInfoStamp, mapFrame);
+        ROS_INFO("update successful");
+        return true;
     }
 
     /**
