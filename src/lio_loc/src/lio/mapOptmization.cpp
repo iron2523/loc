@@ -211,6 +211,7 @@ public:
     ros::Subscriber sub_initial_pose;
     bool has_initialize_pose = false;
     bool system_initialized = false;
+    // bool gicp_pose = false;
     float initialize_pose[6];
 
     /**
@@ -393,10 +394,13 @@ public:
         {
             timeLastProcessing = timeLaserInfoCur;
 
-            // if (!system_initialized)
-            //     if (!systemInitialize())
-            //         return;
-
+            if (!system_initialized)
+                if (!systemInitialize())
+                    return;
+            
+            // if (has_initialize_pose) {
+            //     systemInitialize();
+            // } else return;
             // 当前帧位姿初始化
             // 1、如果是第一帧，用原始imu数据的RPY初始化当前帧位姿（旋转部分）
             // 2、后续帧，用imu里程计计算两帧之间的增量位姿变换，作用于前一帧的激光位姿，得到当前帧激光位姿
@@ -465,6 +469,7 @@ public:
         PointTypePose thisPose6D = trans2PointTypePose(transformTobeMapped);
         *cloudOut += *transformPointCloud(laserCloudSurfLast, &thisPose6D);
         publishCloud(&pubRecentKeyFrame, cloudOut, timeLaserInfoStamp, mapFrame);
+        system_initialized = true;
         ROS_INFO("update successful");
         return true;
     }
