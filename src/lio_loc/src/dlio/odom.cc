@@ -261,8 +261,8 @@ void dlio::OdomNode::initializePubSub() {
   // 发布tf位姿变换， 0.02为50Hz，可以和imu的频率相同
   this->publish_timer = mt_nh.createWallTimer(ros::WallDuration(0.02), std::bind(&dlio::OdomNode::publishPoseThread, this));
   // 最后一个 true表示只触发一次
-  this->publish_timer_ = mt_nh.createWallTimer(ros::WallDuration(2), std::bind(&dlio::OdomNode::publishInitialMap, this), true);
-  this->publish_full_map_ = mt_nh.createWallTimer(ros::WallDuration(2), std::bind(&dlio::OdomNode::publishFullMap, this), true);
+  this->publish_timer_ = mt_nh.createWallTimer(ros::WallDuration(5), std::bind(&dlio::OdomNode::publishInitialMap, this), true);
+  this->publish_full_map_ = mt_nh.createWallTimer(ros::WallDuration(5), std::bind(&dlio::OdomNode::publishFullMap, this), true);
   // publish_timer_ = nh.createTimer(ros::Duration(0.02), &OdomNode::publishPoseThread, this);
 }
 
