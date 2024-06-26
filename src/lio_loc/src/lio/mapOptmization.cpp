@@ -367,8 +367,8 @@ public:
         initialize_pose[4] = msgIn->pose.position.y;
         initialize_pose[5] = msgIn->pose.position.z;
 
-        std::cout << "manual initialize pose: \n" << initialize_pose[3] << "\n" << initialize_pose[4] << "\n" << initialize_pose[5] << "\n" 
-                  << initialize_pose[0] << "\n" << initialize_pose[1] << "\n" << initialize_pose[2] << std::endl;
+        std::cout << "dlio_loc_gicp pose: \n" << "x:" << initialize_pose[3] << "  y:" << initialize_pose[4] << "  z:" << initialize_pose[5] << "\n" 
+                  << "roll:" << initialize_pose[0] << " pitch:" << initialize_pose[1] << " yaw:" << initialize_pose[2] << std::endl;
 
         has_initialize_pose = true;
     }
@@ -393,9 +393,9 @@ public:
         {
             timeLastProcessing = timeLaserInfoCur;
 
-            if (!system_initialized)
-                if (!systemInitialize())
-                    return;
+            // if (!system_initialized)
+            //     if (!systemInitialize())
+            //         return;
 
             // 当前帧位姿初始化
             // 1、如果是第一帧，用原始imu数据的RPY初始化当前帧位姿（旋转部分）
